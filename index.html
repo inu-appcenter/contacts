@@ -3,20 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>서비스 관리자 연락처</title>
-
     <style>
-        .card {
+        body {
             font-family: sans-serif;
-            margin: 12px;
+            margin: 16px;
+        }
+
+        table, th, td {
+            border: 1px solid #e1e1e1;
             padding: 8px;
-            box-shadow: rgba(0, 0, 0, 0.04) 0 2px 10px 0;
-            border-radius: 0.75rem;
+            border-collapse: collapse;
         }
     </style>
     <script>
       window.onload = async function () {
         const serviceName = new URLSearchParams(window.location.search).get('service');
-        const serviceInfo = await (await fetch(`services/${serviceName}.json`)).json();
+        let serviceInfo;
+        try {
+          serviceInfo = await (await fetch(`services/${serviceName}.json`)).json();
+        } catch (e) {
+          document.getElementById('no-service-selected').style.display = 'inherit';
+          return;
+        }
 
         let tableHTML = '<tr>';
         for (const headers in serviceInfo[0]) {
@@ -33,13 +41,24 @@
           tableHTML += '</tr>';
         }
 
+        document.getElementById('title').innerText = `${serviceName} 관리자 연락처`;
         document.getElementById('the-table').innerHTML = tableHTML;
       };
     </script>
 </head>
 <body>
-<table id="the-table" class="card">
-    <!-- 페이지 로드 후에 채워집니다. -->
-</table>
+<div>
+    <h2 id="title">서비스 관리자 연락처</h2>
+
+    <table id="the-table">
+        <!-- 페이지 로드 후에 채워집니다. -->
+    </table>
+
+    <div id="no-service-selected" style="display: none">
+        Query parameter로 올바른 service가 넘어갔는지 확인해주세요.
+        <br>
+        또한 해당 service가 services 디렉토리 아래에 json 파일로 존재하는지 확인해주세요.
+    </div>
+</div>
 </body>
 </html>
